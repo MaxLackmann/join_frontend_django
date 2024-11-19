@@ -119,20 +119,36 @@ function focusMobileSidebar() {
   }
 }
 
+// Globale Variable für Caching
+let usersJsonCache = null;
+
 /**
- * Asynchronously retrieves the user object from the 'users' data source based on the user ID stored in the session storage.
- *
- * @return {Promise<Object|null>} A Promise that resolves to the user object if found, or null if not found.
+ * Lädt die Benutzerliste (nur einmal) und speichert sie im Cache.
  */
+async function loadUsers() {
+  if (!usersJsonCache) {
+    usersJsonCache = await loadData('users'); // Ruft Daten nur einmal ab
+    console.log('Loaded user data:', usersJsonCache);
+  }
+  return usersJsonCache;
+}
+
 async function getUserLogin() {
   let userID = window.sessionStorage.getItem('userId');
-  let usersJson = await loadData('users');
-  for (key in usersJson) {
+  let usersJson = await loadUsers(); // Verwendet den Cache
+
+  if (!userID) {
+    // Kein Benutzer eingeloggt, kehre zurück
+    return null;
+  }
+
+  for (let key in usersJson) {
     let user = usersJson[key];
-    if (user.userId.toString() == userID) {
+    if (user && user.userId !== undefined && user.userId.toString() === userID) {
       return user;
     }
   }
+
   return null;
 }
 
@@ -176,30 +192,48 @@ function userLogOut() {
   window.location.href = '../index.html';
 }
 
-/**
- * Asynchronously opens the sidebar rules for the current user. If the user is not logged in,
- * the sidebar and mobile sidebar are hidden, and the back button is set to redirect to the index page.
- *
- * @return {Promise<void>} A Promise that resolves when the sidebar rules are opened.
- */
 async function openSidebarRules() {
   let currentUser = await getUserLogin();
   let sidebarRules = document.getElementById('menu');
   let mobileSidebarRules = document.getElementById('mobile-mysidebar');
 
-  if (currentUser == null) {
-    if (sidebarRules) sidebarRules.style.display = 'none';
-    if (mobileSidebarRules) mobileSidebarRules.style.display = 'none';
-
-    // Nur, wenn die aktuelle Seite 'privacy_policy.html' oder 'legalnotice.html' ist
-    if (window.location.pathname.includes('privacy_policy.html') || 
-        window.location.pathname.includes('legalnotice.html')) {
-      let arrowBack = document.getElementById('backSummaryRules');
-      if (arrowBack) {
-        arrowBack.href = '../index.html';
-      } else {
-        console.error("Element mit der ID 'backSummaryRules' wurde nicht gefunden.");
-      }
-    }
+  if (!currentUser || currentUser.userId === '0') {
+    if (sidebarRules) sidebarRules.style.display = 'block';
+  } else {
+    if (sidebarRules) sidebarRules.style.display = 'block';
   }
 }
+
+async function checkUserAccess() {
+  let userID = window.sessionStorage.getItem('userId');
+
+  // Ausnahme für die index.html: keine Weiterleitung
+  if (window.location.pathname.includes('/index.html')) {
+    console.log('On index.html. No redirect required.');
+    return;
+  }
+
+  if (!userID) {
+    console.log('No user found. Redirecting to index.html...');
+    window.location.href = '/index.html';
+    return;
+  }
+
+  if (userID !== '0') {
+    let currentUser = await getUserLogin();
+    if (!currentUser) {
+      console.log('Invalid user. Redirecting to index.html...');
+      window.location.href = '/index.html';
+      return;
+    }
+
+    console.log('User is logged in:', currentUser);
+  } else {
+    console.log('Guest access granted.');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async function () {
+  console.log('DOMContentLoaded triggered'); // Prüft, ob das Event ausgelöst wird
+  await checkUserAccess();
+});
