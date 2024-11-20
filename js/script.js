@@ -82,9 +82,7 @@ async function includeHTML() {
 }
 
 /**
- * Focuses on the sidebar link that corresponds to the current page.
- *
- * @return {undefined} This function does not return a value.
+ * Fokus auf die Sidebar-Links setzen.
  */
 function focusSidebar() {
   let currentPage = window.location.href.split('/').pop();
@@ -101,9 +99,7 @@ function focusSidebar() {
 }
 
 /**
- * Focuses on the mobile sidebar link that corresponds to the current page.
- *
- * @return {undefined} This function does not return a value.
+ * Fokus auf die Mobile Sidebar-Links setzen.
  */
 function focusMobileSidebar() {
   let currentPage = window.location.href.split('/').pop();
@@ -119,67 +115,60 @@ function focusMobileSidebar() {
   }
 }
 
-// Globale Variable für Caching
-let usersJsonCache = null;
+let usersJsonCache = null; // Cache für Benutzer
+let usersLoadingPromise = null; // Promise für laufende Datenabfrage
 
 /**
- * Lädt die Benutzerliste (nur einmal) und speichert sie im Cache.
+ * Lädt Benutzer nur einmal und speichert sie im Cache.
  */
 async function loadUsers() {
-  if (!usersJsonCache) {
-    usersJsonCache = await loadData('users'); // Ruft Daten nur einmal ab
+  if (usersJsonCache) {
+    return usersJsonCache;
   }
+
+  if (!usersLoadingPromise) {
+    usersLoadingPromise = loadData('users');
+  }
+
+  usersJsonCache = await usersLoadingPromise;
+  usersLoadingPromise = null;
   return usersJsonCache;
 }
 
+/**
+ * Holt den eingeloggten Benutzer basierend auf `userId` aus `sessionStorage`.
+ */
 async function getUserLogin() {
   let userID = window.sessionStorage.getItem('userId');
-  let usersJson = await loadUsers(); // Verwendet den Cache
+  let usersJson = await loadUsers();
 
   if (!userID) {
-    // Kein Benutzer eingeloggt, kehre zurück
-    return null;
+    return usersJson.find(user => user.id === 0); // Gast-Benutzer
   }
 
-  for (let key in usersJson) {
-    let user = usersJson[key];
-    if (user && user.userId !== undefined && user.userId.toString() === userID) {
-      return user;
-    }
+  let loggedInUser = usersJson.find(user => user.id.toString() === userID);
+  if (!loggedInUser) {
+    return usersJson.find(user => user.id === 0); // Fallback
   }
 
-  return null;
+  return loggedInUser; // Rückgabe des gefundenen Benutzers
 }
+
+let currentUserCache = null; // Globale Variable für eingeloggten Benutzer
 
 /**
- * Asynchronously retrieves the current user's emblem and updates the 'emblemUser' element with it.
- *
- * @return {Promise<void>} A Promise that resolves when the emblem has been updated.
+ * Holt das Emblem des aktuellen Benutzers.
  */
 async function getuseremblem() {
-  let currentUser = await getUserLogin();
-  if (currentUser != null) {
-    let emblemUser = document.getElementById('emblemUser');
-    emblemUser.innerHTML = currentUser.emblem;
-  } else {
-    emblemUser.innerHTML = '';
+  if (!currentUserCache) {
+    currentUserCache = await getUserLogin(); // Benutzerdaten laden, wenn Cache leer ist
+  }
+  const emblemUser = document.getElementById('emblemUser');
+  if (emblemUser) {
+    emblemUser.innerHTML = currentUserCache?.emblem || ''; // Emblem setzen
   }
 }
 
-/**
- * Asynchronously retrieves the current user's emblem and updates the 'emblemUser' element with it.
- *
- * @return {Promise<void>} A Promise that resolves when the emblem has been updated.
- */
-async function getuseremblem() {
-  let currentUser = await getUserLogin();
-  if (currentUser != null) {
-    let emblemUser = document.getElementById('emblemUser');
-    emblemUser.innerHTML = currentUser.emblem;
-  } else {
-    emblemUser.innerHTML = '';
-  }
-}
 
 /**
  * Logs out the current user by removing the user ID from session storage and redirecting to the index page.
@@ -194,7 +183,6 @@ function userLogOut() {
 async function openSidebarRules() {
   let currentUser = await getUserLogin();
   let sidebarRules = document.getElementById('menu');
-  let mobileSidebarRules = document.getElementById('mobile-mysidebar');
 
   if (!currentUser || currentUser.userId === '0') {
     if (sidebarRules) sidebarRules.style.display = 'block';
@@ -208,12 +196,10 @@ async function checkUserAccess() {
 
   // Ausnahme für die index.html: keine Weiterleitung
   if (window.location.pathname.includes('/index.html')) {
-    console.log('On index.html. No redirect required.');
     return;
   }
 
   if (!userID) {
-    console.log('No user found. Redirecting to index.html...');
     window.location.href = '/index.html';
     return;
   }
@@ -221,14 +207,9 @@ async function checkUserAccess() {
   if (userID !== '0') {
     let currentUser = await getUserLogin();
     if (!currentUser) {
-      console.log('Invalid user. Redirecting to index.html...');
       window.location.href = '/index.html';
       return;
     }
-
-    console.log('User is logged in:', currentUser);
-  } else {
-    console.log('Guest access granted.');
   }
 }
 
