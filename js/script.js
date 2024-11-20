@@ -128,7 +128,6 @@ let usersJsonCache = null;
 async function loadUsers() {
   if (!usersJsonCache) {
     usersJsonCache = await loadData('users'); // Ruft Daten nur einmal ab
-    console.log('Loaded user data:', usersJsonCache);
   }
   return usersJsonCache;
 }
@@ -234,6 +233,5 @@ async function checkUserAccess() {
 }
 
 document.addEventListener('DOMContentLoaded', async function () {
-  console.log('DOMContentLoaded triggered'); // Prüft, ob das Event ausgelöst wird
   await checkUserAccess();
 });

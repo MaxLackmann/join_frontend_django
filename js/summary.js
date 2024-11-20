@@ -40,11 +40,6 @@ async function displayGreeting() {
   let isGuest = currentUser.userId == 0;
   document.getElementById('greetText').innerHTML = getGreeting(isGuest);
 }
-async function displayGreeting() {
-  let currentUser = await getUserLogin();
-  let isGuest = currentUser.userId == 0;
-  document.getElementById('greetText').innerHTML = getGreeting(isGuest);
-}
 
 /**
  * Asynchronously displays the current user's name in the HTML element with the id 'greetUserName'.
