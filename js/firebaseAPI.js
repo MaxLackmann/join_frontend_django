@@ -19,6 +19,7 @@ async function loadData(path = '') {
  */
 async function postData(path = '', data = {}) {
   const id = data.id;
+  console.log("Daten, die gesendet werden:", data); // Debugging
   let response = await fetch(BASE_URL + path + '/', {
     method: 'POST',
     headers: {

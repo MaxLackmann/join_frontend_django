@@ -271,12 +271,13 @@ function getSelectedUserIds() {
  * @return {number} The highest card ID found in the tasks array.
  */
 function createCardId(tasks) {
-  let lastCardId = -1;
+  let lastCardId = 0;
   for (let i = 0; i < tasks.length; i++) {
     if (tasks[i].cardId > lastCardId) {
       lastCardId = tasks[i].cardId;
     }
   }
+  console.log('lastCardId', lastCardId);
   return lastCardId; //
 }
 

@@ -21,6 +21,7 @@ function editTaskOfBoard(cardId) {
   boardEdit.push(information);
   document.getElementById('showBigCard').innerHTML = boardAddTaskEdit(cardId);
   renderInformation(cardId);
+  console.log(boardEdit);
 }
 
 /**
@@ -349,6 +350,7 @@ async function editTask(cardId, event) {
   await updateHTML();
   closeEditBoard();
   showBigCard(cardId);
+  console.log ('updatedTask', updatedTask);
 }
 
 /**
@@ -358,12 +360,22 @@ async function editTask(cardId, event) {
  * @return {Promise<void>} A promise that resolves when the task board is successfully updated.
  */
 async function updateEditBoard(cardId, updatedTask) {
-  let tasksJSON = await loadData('tasks');
-  for (let key in tasksJSON) {
-    let task = tasksJSON[key];
-    if (task.cardId == cardId) {
-      await putData(`tasks/${key}/`, updatedTask);
+  try {
+    // Debugging: Überprüfen der Daten
+    console.log('Updating task with ID:', cardId);
+    console.log('Updated task data:', updatedTask);
+
+    // PUT-Anfrage an das Backend senden
+    const response = await putData(`tasks/${cardId}/`, updatedTask);
+
+    // Antwort prüfen
+    if (response.ok) {
+      console.log(`Task with ID ${cardId} updated successfully`);
+    } else {
+      console.error('Failed to update task:', response.statusText);
     }
+  } catch (error) {
+    console.error('Error updating task:', error);
   }
 }
 
