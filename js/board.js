@@ -133,6 +133,7 @@ function renderSmallSubtasks(task) {
  */
 function startDragging(cardId) {
   currentDraggedElement = cardId;
+  console.log(`Dragging card with ID: ${cardId}`);
 }
 
 /**
@@ -167,10 +168,13 @@ async function moveTo(event, status) {
  */
 async function updateBoard(status) {
   let tasksJSON = await loadData('tasks');
+  console.log(tasksJSON);
   for (let key in tasksJSON) {
     let task = tasksJSON[key];
     if (task.cardId == currentDraggedElement) {
-      await putData(`tasks/${key}/status`, status);
+      task.status = status;
+      await putData(`tasks/${task.cardId}`, task);
+      console.log('Task updated successfully');
     }
   }
 }
@@ -247,13 +251,7 @@ async function deleteTaskOfBoard(cardId) {
  * @return {Promise<void>} A promise that resolves when the task is deleted.
  */
 async function deleteTask(cardId) {
-  let tasksJSON = await loadData('tasks');
-  for (let key in tasksJSON) {
-    let task = tasksJSON[key];
-    if (task.cardId == cardId) {
-      await deleteData(`tasks/${key}`);
-    }
-  }
+  await deleteData(`tasks/${cardId}`);
 }
 
 /**
