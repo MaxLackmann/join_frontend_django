@@ -265,28 +265,6 @@ function getSelectedUserIds() {
   return selectedUserIds;
 }
 
-/**
- * Calculates the highest card ID from the given tasks array.
- * @param {Array<Object>} tasks - An array of tasks containing card IDs.
- * @return {number} The highest card ID found in the tasks array.
- */
-function createCardId(tasks) {
-  let lastCardId = -1;
-  for (let i = 0; i < tasks.length; i++) {
-    if (tasks[i].cardId > lastCardId) {
-      lastCardId = tasks[i].cardId;
-    }
-  }
-  console.log('lastCardId', lastCardId);
-  return lastCardId; //
-}
-
-/**
- * Creates a new task board with the given board status and event.
- * @param {string} boardStatus - The status of the board.
- * @param {Event} event - The event that triggered the function.
- * @return {Promise<void>} A promise that resolves when the task is created and added to the board.
- */
 async function createNewTaskBoard(boardStatus, event) {
   event.preventDefault();
   let selectedCategory = document.getElementById('selectedCategory').innerHTML;
@@ -304,23 +282,24 @@ async function createNewTaskBoard(boardStatus, event) {
     categoryErrorMessage.innerHTML = 'Please select a category';
     return;
   }
-  let lastCardId = createCardId(tasks);
   let selectedUserIds = getSelectedUserIds();
   let task = {
     title: document.getElementById('title').value,
     description: document.getElementById('description').value,
-    userId: selectedUserIds,
-    date: document.getElementById('date').value,
+    task_users: selectedUserIds.map(userId => ({
+      user: userId,
+      checked: false // Standardwert, weil es beim Erstellen standardmäßig nicht gecheckt ist
+    })),    date: document.getElementById('date').value,
     priority: getSelectedPrio(),
     category: selectedCategory,
-    subtask: subtaskList,
+    subtasks: subtaskList,
     status: boardStatus,
-    cardId: lastCardId + 1,
   };
   taskAddedToBoard();
   setTimeout(async function () {
     resetUserDisplay();
     await postData('tasks', task);
+    console.log(task);
     clearAllTasks(event);
     closeAddTaskBoard();
     updateHTML();

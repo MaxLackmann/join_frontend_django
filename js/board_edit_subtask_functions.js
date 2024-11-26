@@ -91,13 +91,14 @@ function editCheckSubtask(i) {
   boardEdit[0].subtask[i].subtaskText = document.getElementById(
     `editSubtaskList${i}`
   ).value;
+  console.log("Updated Subtask:", boardEdit[0].subtask[i]); // Debugging
   edit = document.getElementById(`edit-images${i}`);
   edit.innerHTML = checkThisSubtaskHTML(i);
   document
     .getElementById(`edit-main-subtask-container${i}`)
-    .classList.add('edit-subtasklist');
+    .classList.add("edit-subtasklist");
   document
     .getElementById(`edit-main-subtask-container${i}`)
-    .classList.remove('edit-list');
-  document.getElementById(`edit-images${i}`).classList.remove('flex');
+    .classList.remove("edit-list");
+  document.getElementById(`edit-images${i}`).classList.remove("flex");
 }

@@ -8,6 +8,7 @@
  */
 function editTaskOfBoard(cardId) {
   let task = tasks.find((t) => t.cardId == cardId);
+  console.log(task);
   let information = {
     cardId: cardId,
     category: task.category,
@@ -16,7 +17,7 @@ function editTaskOfBoard(cardId) {
     priority: task.priority,
     status: task.status,
     title: task.title,
-    subtask: task.subtask
+    subtask: task.subtasks
   };
   boardEdit.push(information);
   document.getElementById("showBigCard").innerHTML = boardAddTaskEdit(cardId);
@@ -47,7 +48,7 @@ function renderInformation(cardId) {
   renderEditUsers();
   restrictEditPastDate();
   showPickedUsersEmblems(cardId);
-  renderEditSubtask(task.subtask);
+  renderEditSubtask(task.subtasks);
 }
 
 /**
@@ -341,7 +342,7 @@ async function editTask(cardId, event) {
     date: document.getElementById("editDate").value,
     priority: getEditSelectedPrio(),
     category: boardEdit[0].category,
-    subtask: boardEdit[0].subtask,
+    subtasks: boardEdit[0].subtask,
     status: boardEdit[0].status,
     cardId: cardId
   };
@@ -367,9 +368,8 @@ async function updateEditBoard(cardId, updatedTask) {
 
     // PUT-Anfrage an das Backend senden
     const response = await putData(`tasks/${cardId}`, updatedTask);
-
-    // Prüfe den Statuscode direkt
-    console.log("Task Status:", response.status);
+    console.log("Response:", response);
+    console.log(`Path: tasks/${cardId}`);
   } catch (error) {
     console.error("Error updating task:", error);
   }

@@ -37,9 +37,9 @@ async function renderBigSubtasks(cardId) {
   let bigSubtask = document.getElementById('bigSubtasks');
   bigSubtask.innerHTML = ''; // Clear existing subtasks
   const task = tasks.find((t) => t.cardId == cardId);
-  if (task && task.subtask) {
-    for (let j = 0; j < task.subtask.length; j++) {
-      const subtask = task.subtask[j];
+  if (task && task.subtasks) {
+    for (let j = 0; j < task.subtasks.length; j++) {
+      const subtask = task.subtasks[j];
       bigSubtask.innerHTML += renderBigSubtasksHTML(cardId, subtask, j); // Append each subtask's HTML to the string
     }
   }

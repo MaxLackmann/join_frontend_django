@@ -18,8 +18,6 @@ async function loadData(path = '') {
  * @return {Promise<Object>} - A promise that resolves to the parsed JSON response from the Firebase Realtime Database.
  */
 async function postData(path = '', data = {}) {
-  const id = data.id;
-  console.log("Daten, die gesendet werden:", data); // Debugging
   let response = await fetch(BASE_URL + path + '/', {
     method: 'POST',
     headers: {
@@ -27,6 +25,7 @@ async function postData(path = '', data = {}) {
     },
     body: JSON.stringify(data),
   });
+  console.log("direction to", BASE_URL + path + '/');
   return await response.json();
 }
 
@@ -80,6 +79,28 @@ async function putData(path = '', data = {}) {
       }
 
       return await response.json();
+  } catch (error) {
+      console.error('Error updating data:', error);
+      return { success: false, message: error.message };
+  }
+}
+
+async function patchData(path = '', data = {}) {
+  try {
+      let response = await fetch(BASE_URL + path + '/', {
+          method: 'PATCH',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status}`);
+      }
+
+      return await response.json();
+  
   } catch (error) {
       console.error('Error updating data:', error);
       return { success: false, message: error.message };
