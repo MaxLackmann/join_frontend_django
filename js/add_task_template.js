@@ -3,7 +3,7 @@
  *
  * @return {void} This function does not return a value.
  */
-function renderUsersHTML(contact, i) {
+function renderContactsHTML(contact, i) {
   return /*html*/ `
         <label for="checkbox${i}">
             <li class="contact-list" id="contactList${i}">        

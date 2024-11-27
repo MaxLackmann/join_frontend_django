@@ -145,15 +145,15 @@ function renderBoardAddTaskHTML(boardStatus) {
  * @param {number} i - The index of the user in the list.
  * @return {string} The HTML string representing the user in the contact list.
  */
-function renderUsersHTML(user, i) {
+function renderContactsHTML(contact, i) {
   return /*html*/ `
       <label for="checkbox${i}">
           <li class="contactlist" id="contactList${i}">        
-              <div tabindex="0" class="emblem" style="background-color: ${user.color}">
-                ${user.emblem}
+              <div tabindex="0" class="emblem" style="background-color: ${contact.color}">
+                ${contact.emblem}
               </div> 
-              <div class="contact-name" >${user.name}</div> 
-              <input class="user-checkbox" onclick="showUsersEmblem()" type="checkbox" id="checkbox${i}" data-userid="${user.userId}">          
+              <div class="contact-name" >${contact.name}</div> 
+              <input class="user-checkbox" onclick="showUsersEmblem()" type="checkbox" id="checkbox${i}" data-userid="${contact.userId}">          
           </li>
       </label>
         `;

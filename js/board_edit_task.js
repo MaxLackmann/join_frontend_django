@@ -229,10 +229,9 @@ function restrictEditPastDate() {
 function renderEditUsers() {
   let content = document.getElementById("editUsers");
 
-  for (let i = 0; i < users.length; i++) {
-    if (users[i].userId == 0) continue;
-    const user = users[i];
-    content.innerHTML += renderEditUsersHTML(user, i);
+  for (let i = 0; i < contacts.length; i++) {
+    const contact = contacts[i];
+    content.innerHTML += renderEditContactsHTML(user, i);
   }
 }
 

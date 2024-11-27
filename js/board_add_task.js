@@ -10,7 +10,7 @@ function showBoardAddTask(boardStatus) {
   let content = document.getElementById('boardAddTask');
   content.innerHTML = '';
   content.innerHTML = renderBoardAddTaskHTML(boardStatus);
-  renderUsers();
+  renderContacts();
   renderCategorys();
   restrictPastDate();
 }
@@ -102,12 +102,12 @@ window.onload = function () {
  * Renders the list of users by appending their HTML representation to the 'users' element.
  * @return {void} This function does not return a value.
  */
-function renderUsers() {
-  let content = document.getElementById('users');
-  for (let i = 0; i < users.length; i++) {
-    if (users[i].userId == 0) continue;
-    const user = users[i];
-    content.innerHTML += renderUsersHTML(user, i);
+function renderContacts() {
+  let content = document.getElementById('contacts');
+  for (let i = 0; i < contacts.length; i++) {
+    const contact = contacts[i];
+    content.innerHTML += renderContactsHTML(contact, i);
+    console.log(contact);
   }
 }
 
@@ -289,7 +289,8 @@ async function createNewTaskBoard(boardStatus, event) {
     task_users: selectedUserIds.map(userId => ({
       user: userId,
       checked: false // Standardwert, weil es beim Erstellen standardmäßig nicht gecheckt ist
-    })),    date: document.getElementById('date').value,
+    })),    
+    date: document.getElementById('date').value,
     priority: getSelectedPrio(),
     category: selectedCategory,
     subtasks: subtaskList,

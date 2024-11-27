@@ -11,7 +11,7 @@
 async function initAdd() {
   restrictPastDate();
   includeHTML();
-  await usersArray();
+  await contactsArray();
   await tasksArray();
   renderUsers();
   renderCategorys();
@@ -112,7 +112,7 @@ function renderUsers() {
   for (let i = 0; i < users.length; i++) {
     if (users[i].userId == 0) continue;
     const contact = users[i];
-    user.innerHTML += renderUsersHTML(contact, i);
+    user.innerHTML += renderContactsHTML(contact, i);
   }
 }
 
@@ -303,21 +303,6 @@ function getSelectedUserIds() {
 }
 
 /**
- * Generates a new card ID based on the existing tasks.
- * @param {Array<Object>} tasks - An array of task objects containing cardId.
- * @return {number} The new card ID.
- */
-function createCardId(tasks) {
-  let lastCardId = -1;
-  for (let i = 0; i < tasks.length; i++) {
-    if (tasks[i].cardId > lastCardId) {
-      lastCardId = tasks[i].cardId;
-    }
-  }
-  return lastCardId; //
-}
-
-/**
  * Creates a new task and adds it to the board.
  * @param {Event} event - The event object that triggered the function.
  * @return {Promise<void>} - A promise that resolves when the task is created and added to the board.
@@ -339,18 +324,19 @@ async function createNewTask(event) {
     categoryErrorMessage.innerHTML = 'Please select a category';
     return;
   }
-  let lastCardId = createCardId(tasks);
   let selectedUserIds = getSelectedUserIds();
   let task = {
     title: document.getElementById('title').value,
     description: document.getElementById('description').value,
-    userId: selectedUserIds,
+    task_users: selectedUserIds.map(userId => ({
+      user: userId,
+      checked: false // Standardwert, weil es beim Erstellen standardmäßig nicht gecheckt ist
+    })),    
     date: document.getElementById('date').value,
     priority: getSelectedPrio(),
     category: selectedCategory,
-    subtask: subtaskList,
+    subtasks: subtaskList,
     status: 'toDo',
-    cardId: lastCardId + 1,
   };
   taskAddedToBoard();
   setTimeout(async function () {

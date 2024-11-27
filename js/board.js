@@ -4,7 +4,7 @@
  */
 async function initBoard() {
   includeHTML();
-  await usersArray();
+  await contactsArray();
   await tasksArray();
   await updateHTML();
 }

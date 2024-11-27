@@ -154,15 +154,15 @@ function checkThisSubtaskHTML(i) {
  * @param {number} i - The index of the user in the list.
  * @return {string} The HTML for the edit user element.
  */
-function renderEditUsersHTML(user, i) {
+function renderEditContactsHTML(contact, i) {
   return /*html*/ `
             <label for="editCheckbox${i}">
                 <li class="edit-contactlist" id="edit-contactlist${i}">        
-                    <div tabindex="0" class="edit-emblem" style="background-color: ${user.color}">
-                      ${user.emblem}
+                    <div tabindex="0" class="edit-emblem" style="background-color: ${contact.color}">
+                      ${contact.emblem}
                     </div> 
-                    <div class="edit-contact-name" >${user.name}</div> 
-                    <input class="edit-user-checkbox" onclick="showEditUsersEmblem(event)" type="checkbox" id="editCheckbox${i}" data-userid="${user.userId}">          
+                    <div class="edit-contact-name" >${contact.name}</div> 
+                    <input class="edit-user-checkbox" onclick="showEditUsersEmblem(event)" type="checkbox" id="editCheckbox${i}" data-userid="${contact.userId}">          
                 </li>
             </label> `;
 }

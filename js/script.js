@@ -17,7 +17,7 @@ let colors = [
 ];
 
 let categorys = ['Technical Task', 'User Story', 'Development', 'Editing'];
-let users = [];
+let contacts = [];
 let tasks = [];
 let isTasksArrayLoading = false;
 
@@ -50,11 +50,11 @@ async function tasksArray() {
  *
  * @return {Promise<void>} A Promise that resolves when the users array is updated.
  */
-async function usersArray() {
-  let usersJson = await loadData('users');
-  for (let key in usersJson) {
-    let user = usersJson[key];
-    users.push(user);
+async function contactsArray() {
+  let conctactsJson = await loadData('contacts');
+  for (let key in conctactsJson) {
+    let contact = conctactsJson[key];
+    contacts.push(contact);
   }
 }
 
