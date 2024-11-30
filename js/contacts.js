@@ -9,8 +9,6 @@ async function initContact() {
   renderListContact();
 }
 
-let contacts = [];
-
 /**
  * Asynchronously loads contacts data from the server and populates the contacts array.
  */
@@ -39,7 +37,8 @@ async function newContact(event) {
     email: document.getElementById("emailContact").value,
     phone: document.getElementById("phoneContact").value,
     emblem: renderEmblem(nameContact),
-    color: colorRandom()
+    color: colorRandom(),
+    checked: false,
   };
   contacts.push(newContact);
   await postData("contacts", newContact);

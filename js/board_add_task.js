@@ -98,16 +98,11 @@ window.onload = function () {
   }
 };
 
-/**
- * Renders the list of users by appending their HTML representation to the 'users' element.
- * @return {void} This function does not return a value.
- */
 function renderContacts() {
-  let content = document.getElementById('contacts');
+  let user = document.getElementById('users');
   for (let i = 0; i < contacts.length; i++) {
     const contact = contacts[i];
-    content.innerHTML += renderContactsHTML(contact, i);
-    console.log(contact);
+    user.innerHTML += renderContactsHTML(contact, i);
   }
 }
 
@@ -181,9 +176,8 @@ function showUsersEmblem() {
   usersEmblem.innerHTML = '';
   let renderedCount = 0;
   let extraCount = 0;
-  for (let i = 0; i < users.length; i++) {
-    if (users[i].userId == 0) continue;
-    let contact = users[i];
+  for (let i = 0; i < contacts.length; i++) {
+    let contact = contacts[i];
     let contactListChecked = document.getElementById('contactList' + i);
     let checkedContact = document.getElementById(`checkbox${i}`);
     if (checkedContact.checked == true) {
@@ -250,19 +244,25 @@ function getSelectedPrio() {
 }
 
 /**
- * Retrieves the IDs of all selected checkboxes in the contact list.
- * @return {Array<string>} An array of selected user IDs.
+ * Returns an array of selected contacts with their checked status.
+ * @return {Array<Object>} An array of objects containing the full contact object and their checked status.
  */
-function getSelectedUserIds() {
+function selectedContactsIds() {
   let checkboxes = document.querySelectorAll(
     '.contactlist input[type="checkbox"]:checked'
   );
-  let selectedUserIds = [];
+  let selectedContacts = [];
   for (let checkbox of checkboxes) {
-    let userId = checkbox.getAttribute('data-userid');
-    selectedUserIds.push(userId);
+    let contactId = checkbox.getAttribute('data-userid');
+    let contact = contacts.find(c => c.id == contactId); // Suche den Kontakt aus der `contacts`-Liste
+    if (contact) {
+      selectedContacts.push({
+        contact: contact,
+        checked: checkbox.checked,
+      });
+    }
   }
-  return selectedUserIds;
+  return selectedContacts;
 }
 
 async function createNewTaskBoard(boardStatus, event) {
@@ -282,14 +282,17 @@ async function createNewTaskBoard(boardStatus, event) {
     categoryErrorMessage.innerHTML = 'Please select a category';
     return;
   }
-  let selectedUserIds = getSelectedUserIds();
+  let selectedContacts  = selectedContactsIds(); // IDs der ausgewählten Kontakte
+  let taskContacts = selectedContacts.map(contactData => {
+    return {
+      contact: contactData.contact, // Kontakt-Objekt
+      checked: contactData.checked, // Checked-Status
+    };
+  });
   let task = {
     title: document.getElementById('title').value,
     description: document.getElementById('description').value,
-    task_users: selectedUserIds.map(userId => ({
-      user: userId,
-      checked: false // Standardwert, weil es beim Erstellen standardmäßig nicht gecheckt ist
-    })),    
+    task_contacts: taskContacts,
     date: document.getElementById('date').value,
     priority: getSelectedPrio(),
     category: selectedCategory,

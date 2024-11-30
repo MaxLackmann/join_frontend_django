@@ -162,7 +162,7 @@ function renderEditContactsHTML(contact, i) {
                       ${contact.emblem}
                     </div> 
                     <div class="edit-contact-name" >${contact.name}</div> 
-                    <input class="edit-user-checkbox" onclick="showEditUsersEmblem(event)" type="checkbox" id="editCheckbox${i}" data-userid="${contact.userId}">          
+                    <input class="edit-user-checkbox" onclick="showEditUsersEmblem(event)" type="checkbox" id="editCheckbox${i}" data-userid="${contact.id}">          
                 </li>
             </label> `;
 }
@@ -172,11 +172,11 @@ function renderEditContactsHTML(contact, i) {
  * @param {Object} user - The user object containing information about the user.
  * @return {string} The HTML for the edit emblem user element.
  */
-function renderEditEmblemUsers(user) {
+function renderEditEmblemUsers(contact) {
   return /*html*/ `
       <div class="edit-single-user">
-          <div class="edit-emblem" style="background-color: ${user.color}" id="${user.userId}">
-            ${user.emblem}
+          <div class="edit-emblem" style="background-color: ${contact.color}" id="${contact.id}">
+            ${contact.emblem}
           </div>
         </div>
       `;
@@ -205,9 +205,9 @@ function renderGreyEmblem(remainingCount) {
  * @param {Object} user - The user object containing color, userId, and emblem.
  * @return {string} The HTML string for the user's emblem.
  */
-function renderEmblemUsers(user) {
+function renderEmblemUsers(contact) {
   return /*html*/ `
-          <div class="edit-emblem" style="background-color: ${user.color}" id="${user.userId}">
-          ${user.emblem}
+          <div class="edit-emblem" style="background-color: ${contact.color}" id="${contact.id}">
+          ${contact.emblem}
         </div>  `;
 }

@@ -19,6 +19,7 @@ let colors = [
 let categorys = ['Technical Task', 'User Story', 'Development', 'Editing'];
 let contacts = [];
 let tasks = [];
+let taskContacts = [];
 let isTasksArrayLoading = false;
 
 /**
@@ -45,40 +46,51 @@ async function tasksArray() {
   }
 }
 
-/**
- * Asynchronously loads the users array from the 'users' data source and updates the global 'users' array.
- *
- * @return {Promise<void>} A Promise that resolves when the users array is updated.
- */
 async function contactsArray() {
-  let conctactsJson = await loadData('contacts');
-  for (let key in conctactsJson) {
-    let contact = conctactsJson[key];
-    contacts.push(contact);
+  try {
+    let conctactsJson = await loadData('contacts');
+    for (let key in conctactsJson) {
+      let contact = conctactsJson[key];
+      contacts.push(contact);
+    }
+  } catch (error) {
+    console.error('Fehler beim Laden von Kontakten:', error);
   }
 }
 
+async function taskContactsArray() {
+  try {
+    let taskContactsJson = await loadData('taskcontacts'); // Anstatt 'contacts'
+    for (let key in taskContactsJson) {
+      let taskContact = taskContactsJson[key];
+      taskContacts.push(taskContact); // Hier kommen die Task-Contact-Verknüpfungen
+    }
+  } catch (error) {
+    console.error('Fehler beim Laden von Task-Contacts:', error);
+  }
+  console.log('Task-Contacts geladen:', taskContacts);
+}
+
 /**
- * Asynchronously includes HTML content in elements with the attribute 'w3-include-html'.
- *
- * @return {Promise<void>} A Promise that resolves after including the HTML content.
+ * Dynamically includes HTML content from specified files into elements with the 'w3-include-html' attribute.
+ * @return {Promise<void>}
  */
 async function includeHTML() {
   let includeElements = document.querySelectorAll('[w3-include-html]');
-  for (let i = 0; i < includeElements.length; i++) {
-    const element = includeElements[i];
-    file = element.getAttribute('w3-include-html');
-    let resp = await fetch(file);
-    if (resp.ok) {
-      element.innerHTML = await resp.text();
-    } else {
-      element.innerHTML = 'Page not found';
+  for (let element of includeElements) {
+    let file = element.getAttribute('w3-include-html');
+    try {
+      let response = await fetch(file);
+      if (response.ok) {
+        element.innerHTML = await response.text();
+      } else {
+        console.error(`Error fetching file: ${file}, Status: ${response.status}`);
+        element.innerHTML = 'Content not found';
+      }
+    } catch (error) {
+      console.error(`Error including HTML for ${file}:`, error);
     }
   }
-  focusSidebar();
-  focusMobileSidebar();
-  getuseremblem();
-  openSidebarRules();
 }
 
 /**

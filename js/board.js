@@ -7,6 +7,9 @@ async function initBoard() {
   await contactsArray();
   await tasksArray();
   await updateHTML();
+
+  console.log("Board initialized", tasks);
+  console.log("Contacts initialized", contacts);
 }
 
 let boardEdit = [];
@@ -91,14 +94,12 @@ function renderUserEmblems(task, container) {
   let renderedCount = 0;
   let extraCount = 0;
 
-  if (task.userId && task.userId.length > 0) {
-    for (let userId of task.userId) {
-      if (userId == 0) continue;
-
-      let user = users.find((u) => u.userId == userId);
-      if (user) {
+  if (task.task_contacts && task.task_contacts.length > 0) {
+    for (let taskContact of task.task_contacts) {
+      let contact = taskContact.contact;
+      if (taskContact.checked && contact) {
         if (renderedCount < 5) {
-          container.innerHTML += renderSmallUsersEmblem(user);
+          container.innerHTML += renderSmallUsersEmblem(contact);
           renderedCount++;
         } else {
           extraCount++;
@@ -118,9 +119,9 @@ function renderSmallSubtasks(task) {
   let smallSubtask = document.getElementById(
     `subtaskProgressBar${task.cardId}`
   );
-  if (task.subtask && task.subtask.length > 0) {
-    for (let j = 0; j < task.subtask.length; j++) {
-      const subtask = task.subtask[j];
+  if (task.subtasks && task.subtasks.length > 0) {
+    for (let j = 0; j < task.subtasks.length; j++) {
+      const subtask = task.subtasks[j];
       smallSubtask.innerHTML += `<div>${subtask}</div> `; // Append each subtask's HTML to the string
     }
   }
@@ -251,23 +252,6 @@ async function deleteTaskOfBoard(cardId) {
 async function deleteTask(cardId) {
   await deleteData(`tasks/${cardId}`);
 }
-
-/**
- * Retrieves the selected user IDs from checkboxes in the '.contactlist' element.
- * @return {Array} An array of user IDs that are selected.
- */
-function getSelectedUserIds() {
-  let checkboxes = document.querySelectorAll(
-    '.contactlist input[type="checkbox"]:checked'
-  );
-  let selectedUserIds = [];
-  for (let checkbox of checkboxes) {
-    let userId = checkbox.getAttribute("data-userid");
-    selectedUserIds.push(userId);
-  }
-  return selectedUserIds;
-}
-
 /**
  * Updates the status of a subtask and refreshes the HTML display.
  * @param {string} cardId - The ID of the card containing the subtask.
@@ -322,7 +306,6 @@ async function updateSubtasks(cardId, isubtask, value) {
       if (subtask) {
         subtask.checked = value; // Aktualisiere den `checked`-Status
         await putData(`tasks/${task.cardId}/subtasks/${isubtask}`, subtask);
-        console.log(`tasks/${task.cardId}/subtasks/${isubtask}`, subtask);
       }
     }
   }
@@ -336,7 +319,7 @@ async function updateSubtasks(cardId, isubtask, value) {
  */
 function renderProgressBar(cardId, tasks) {
   const task = tasks.find((t) => t.cardId == cardId);
-  let subtasks = task.subtask;
+  let subtasks = task.subtasks;
   updateProgressBarDisplay(cardId, subtasks);
 }
 

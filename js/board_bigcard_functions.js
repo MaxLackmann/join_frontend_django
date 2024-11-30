@@ -16,13 +16,14 @@ async function showBigUsersEmblem(cardId) {
   let bigUsersEmblem = document.getElementById('bigUsersEmblem');
   bigUsersEmblem.innerHTML = '';
 
+  // Find the task with the specified cardId
   const task = tasks.find((t) => t.cardId == cardId);
-  if (task && task.userId) {
-    for (let userId of task.userId) {
-      if (userId == 0) continue; // Skip if userId is 0
-      let user = users.find((u) => u.userId == userId);
-      if (user) {
-        bigUsersEmblem.innerHTML += renderBigEmblemUsers(user);
+
+  if (task && task.task_contacts) {
+    for (let taskContact of task.task_contacts) {
+      if (taskContact.checked && taskContact.contact) { // Ensure the contact is valid and checked
+        const contact = taskContact.contact;
+        bigUsersEmblem.innerHTML += renderBigEmblemUsers(contact);
       }
     }
   }

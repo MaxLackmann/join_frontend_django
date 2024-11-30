@@ -185,7 +185,7 @@
 .summary-main-container {
   display: flex;
   margin-top: 150px;
-  margin-left: 300px;
+  margin-left: 240px;
   height: calc(100vh - 230px);
 }
 
@@ -284,20 +284,12 @@
 }
 
 @media (max-width: 1250px) {
-  .summary-main-container {
-    margin-left: 260px;
-  }
-
   .greet-user-name {
     font-size: 50px;
   }
 }
 
 @media (max-width: 1100px) {
-  .summary-main-container {
-    margin-left: 230px;
-  }
-
   .summary-card-container {
     width: 560px;
   }

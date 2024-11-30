@@ -13,7 +13,7 @@ async function initAdd() {
   includeHTML();
   await contactsArray();
   await tasksArray();
-  renderUsers();
+  renderContacts();
   renderCategorys();
 }
 
@@ -107,11 +107,10 @@ window.onload = function () {
  * Renders users based on the users array.
  * @return {void} This function does not return a value.
  */
-function renderUsers() {
+function renderContacts() {
   let user = document.getElementById('users');
-  for (let i = 0; i < users.length; i++) {
-    if (users[i].userId == 0) continue;
-    const contact = users[i];
+  for (let i = 0; i < contacts.length; i++) {
+    const contact = contacts[i];
     user.innerHTML += renderContactsHTML(contact, i);
   }
 }
@@ -203,9 +202,8 @@ function showUsersEmblem() {
   usersEmblem.innerHTML = '';
   let renderedCount = 0;
   let extraCount = 0;
-  for (let i = 0; i < users.length; i++) {
-    if (users[i].userId == 0) continue;
-    let contact = users[i];
+  for (let i = 0; i < contacts.length; i++) {
+    let contact = contacts[i];
     let contactListChecked = document.getElementById('contactList' + i);
     let checkedContact = document.getElementById(`checkbox${i}`);
     if (checkedContact.checked == true) {
@@ -287,19 +285,25 @@ function getSelectedPrio() {
 }
 
 /**
- * Returns an array of selected user IDs from the checkboxes in the '.contact-list' element.
- * @return {Array<string>} An array of selected user IDs.
+ * Returns an array of selected contacts with their checked status.
+ * @return {Array<Object>} An array of objects containing the full contact object and their checked status.
  */
-function getSelectedUserIds() {
+function selectedContactsIds() {
   let checkboxes = document.querySelectorAll(
-    '.contact-list input[type="checkbox"]:checked'
+    '.contact-list input[type="checkbox"]'
   );
-  let selectedUserIds = [];
+  let selectedContacts = [];
   for (let checkbox of checkboxes) {
-    let userId = checkbox.getAttribute('data-userid');
-    selectedUserIds.push(userId);
+    let contactId = checkbox.getAttribute('data-userid');
+    let contact = contacts.find(c => c.id == contactId); // Suche den Kontakt aus der `contacts`-Liste
+    if (contact) {
+      selectedContacts.push({
+        contact: contact,
+        checked: checkbox.checked,
+      });
+    }
   }
-  return selectedUserIds;
+  return selectedContacts;
 }
 
 /**
@@ -309,6 +313,7 @@ function getSelectedUserIds() {
  */
 async function createNewTask(event) {
   event.preventDefault();
+
   let selectedCategory = document.getElementById('selectedCategory').innerHTML;
   let spanContactContainer = document.getElementById(
     'selectedCategoryContainer'
@@ -324,26 +329,33 @@ async function createNewTask(event) {
     categoryErrorMessage.innerHTML = 'Please select a category';
     return;
   }
-  let selectedUserIds = getSelectedUserIds();
+
+  let selectedContacts  = selectedContactsIds(); // IDs der ausgewählten Kontakte
+  let taskContacts = selectedContacts.map(contactData => {
+    return {
+      contact: contactData.contact, // Kontakt-Objekt
+      checked: contactData.checked, // Checked-Status
+    };
+  });
+
   let task = {
     title: document.getElementById('title').value,
     description: document.getElementById('description').value,
-    task_users: selectedUserIds.map(userId => ({
-      user: userId,
-      checked: false // Standardwert, weil es beim Erstellen standardmäßig nicht gecheckt ist
-    })),    
+    task_contacts: taskContacts, // Verknüpfte Kontakte
     date: document.getElementById('date').value,
     priority: getSelectedPrio(),
     category: selectedCategory,
     subtasks: subtaskList,
     status: 'toDo',
   };
+
   taskAddedToBoard();
+
   setTimeout(async function () {
-    resetUserDisplay();
-    await postData('tasks', task);
-    location.href = 'board.html';
-    clearAllTasks(event);
+    console.log("Payload to POST:", task);
+    await postData('tasks', task); // POST-API-Aufruf
+    // location.href = 'board.html'; // Weiterleitung
+    clearAllTasks(event); // Formular zurücksetzen
   }, 3000);
 }
 

@@ -1,5 +1,5 @@
 .privacy-policy {
-    margin: 200px 100px 32px 300px;
+    margin: 200px 100px 32px 240px;
     position: sticky;
     display: flex;
     flex-direction: column;
@@ -16,10 +16,6 @@
   }
   
   @media (max-width: 1425px) {
-    .privacy-policy  {
-      margin: 200px 100px 32px 300px;  
-      }
-    
       .text {
         margin-top: 20px;
       }

@@ -11,7 +11,7 @@ function renderContactsHTML(contact, i) {
                   ${contact.emblem}
                 </div> 
                 <div class="contact-name" >${contact.name}</div> 
-                <input class="user-checkbox" onclick="showUsersEmblem()" type="checkbox" id="checkbox${i}" data-userid="${contact.userId}">          
+                <input class="user-checkbox" onclick="showUsersEmblem()" type="checkbox" id="checkbox${i}" data-userid="${contact.id}">          
             </li>
         </label> `;
 }

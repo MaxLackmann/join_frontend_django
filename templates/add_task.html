@@ -23,14 +23,14 @@
   <div w3-include-html="../templates/header.html"></div>
   <div w3-include-html="../templates/mobile_taskbar.html"></div>
   <div class="main-container"> 
-  <h1 class="headline-task">Add Task</h1>
-  <form class="add-task-container" onsubmit="createNewTask(event);">
     <div id="taskAddedToBoard" class="task-added-to-board">
       <div id="taskAddedToBoardStyle" class="task-added-to-board-style">
         <span>Task added to board</span>
         <img src="../assets/icons/board.svg" alt="">
       </div>
     </div>
+  <h1 class="headline-task">Add Task</h1>
+  <form class="add-task-container" onsubmit="createNewTask(event);">
     <div class="first-task-input-container">
       <span>Title<span class="required-color">*</span></span>
       <input id="title" type="text" required />
