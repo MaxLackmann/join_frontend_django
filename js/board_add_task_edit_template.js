@@ -162,7 +162,7 @@ function renderEditContactsHTML(contact, i) {
                       ${contact.emblem}
                     </div> 
                     <div class="edit-contact-name" >${contact.name}</div> 
-                    <input class="edit-user-checkbox" onclick="showEditUsersEmblem(event)" type="checkbox" id="editCheckbox${i}" data-userid="${contact.id}">          
+                    <input class="edit-user-checkbox" onchange="saveCheckedUsers()" type="checkbox" id="editCheckbox${i}" data-userid="${contact.id}">          
                 </li>
             </label> `;
 }

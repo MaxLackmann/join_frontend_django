@@ -496,6 +496,11 @@ input[type='checkbox'] {
     height: 28px;
   }
 
+  .edit-grey-emblem {
+    width: 30px;
+    height: 28px;
+  }
+
   .addTaskBtn-Container {
     margin-left: 0px;
   }

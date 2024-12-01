@@ -680,6 +680,10 @@ input[type='checkbox'] {
     width: 30px;
     height: 28px;
   }
+  .grey-emblem {
+    width: 30px;
+    height: 28px;
+  }
   .addtask-button-container {
     margin-left: 0px;
   }

@@ -23,7 +23,6 @@ function editTaskOfBoard(cardId) {
   boardEdit.push(information);
   document.getElementById("showBigCard").innerHTML = boardAddTaskEdit(cardId);
   renderInformation(cardId);
-  console.log(boardEdit);
 }
 
 /**
@@ -48,7 +47,7 @@ function renderInformation(cardId) {
   editTogglePriority(task.priority);
   renderEditContacts();
   restrictEditPastDate();
-  showPickedUsersEmblems(cardId);
+  updateCheckedUsersInEdit(cardId);
   renderEditSubtask(task.subtasks);
 }
 
@@ -236,77 +235,53 @@ function renderEditContacts() {
   }
 }
 
-let hiddenUserIds = new Set();
 /**
- * Displays the user emblems for the given card ID in the 'editUsersEmblem' element.
- * Only renders up to 5 emblems, with any additional emblems displayed as grey.
- * Hides any user emblems that are not present in the 'task.userId' array.
- * @param {string} cardId - The ID of the card to display emblems for.
+ * Updates the 'editUsersEmblem' element by rendering user emblems based on the checked status
+ * of contacts in the current task. The function finds the task associated with the current
+ * card ID, checks which contacts are selected, and updates the checkbox and CSS class
+ * accordingly. It renders up to 5 user emblems in the 'editUsersEmblem' element, and if the
+ * number of checked users exceeds 5, it renders a gray emblem indicating the extra count.
+ * Skips contacts for which the checkbox or list item does not exist.
  * @return {void} This function does not return a value.
  */
-function showPickedUsersEmblems(cardId) {
-  let editUsersEmblem = document.getElementById("editUsersEmblem");
-  editUsersEmblem.innerHTML = "";
-  let renderedCount = 0;
-  let extraCount = 0;
-
-  const task = tasks.find((t) => t.cardId == cardId);
-  if (task && task.task_contacts) {
-    for (let taskContact of task.task_contacts) {
-      if (taskContact.checked && taskContact.contact) {
-        let contact = taskContact.contact;
-        if (renderedCount < 5) {
-          editUsersEmblem.innerHTML += renderEditEmblemUsers(contact);
-          renderedCount++;
-        } else {
-          extraCount++;
-        }
-      }
-    }
-
-    hiddenUserIds.clear();
-    if (extraCount > 0) {
-      let hiddenUsers = task.task_contacts.slice(5);
-      for (let hiddenContact of hiddenUsers) {
-        hiddenUserIds.add(hiddenContact.contact.id); // Verwende `contact.id`
-      }
-      editUsersEmblem.innerHTML += renderGreyEmblem(extraCount);
-    }
-  }
-
-  checkUserCheckboxesBasedOnEmblems();
-  showEditUsersEmblem(task); // Task übergeben
-}
-
-/**
- * Renders the emblem for each user in the 'editUsersEmblem' element based on the checked state of their checkbox.
- * If the number of rendered emblems exceeds 5, additional emblems are rendered as grey.
- * @return {void} This function does not return a value.
- */
-function showEditUsersEmblem(task) {
+function updateCheckedUsersInEdit() {
   let usersEmblem = document.getElementById("editUsersEmblem");
   usersEmblem.innerHTML = "";
+
+  const taskId = boardEdit[0]?.cardId;
+  const task = tasks.find((t) => t.cardId == taskId);
+
+  if (!task || !task.task_contacts) return;
+
   let renderedCount = 0;
   let extraCount = 0;
 
-  for (let i = 0; i < task.task_contacts.length; i++) {
-    let taskContact = task.task_contacts[i]; // Zugriff auf das einzelne Element
-    let contact = taskContact.contact; // Zugriff auf die `contact`-Eigenschaft
+  for (let i = 0; i < contacts.length; i++) {
+    const contact = contacts[i];
+    const checkbox = document.getElementById(`editCheckbox${i}`);
+    const contactListItem = document.getElementById(`edit-contactlist${i}`);
 
-    let contactListChecked = document.getElementById("edit-contactlist" + i);
-    let checkedContact = document.getElementById(`editCheckbox${i}`);
+    if (!checkbox || !contactListItem) continue; // Falls die Checkbox oder das Listenelement nicht existieren, überspringen
 
-    if (checkedContact && checkedContact.checked) {
-      // Sicherstellen, dass das Element existiert
-      contactListChecked.classList.add("edit-contactlist-selected");
+    const isChecked = task.task_contacts.some(
+      (tc) => tc.contact.id === contact.id && tc.checked
+    );
+
+    checkbox.checked = isChecked;
+
+    if (checkbox.checked) {
+      contactListItem.classList.add("edit-contactlist-selected");
+    } else {
+      contactListItem.classList.remove("edit-contactlist-selected");
+    }
+
+    if (isChecked) {
       if (renderedCount < 5) {
-        usersEmblem.innerHTML += renderEditEmblemUsers(contact); // Verwende `contact` direkt
+        usersEmblem.innerHTML += renderEditEmblemUsers(contact);
         renderedCount++;
       } else {
         extraCount++;
       }
-    } else if (contactListChecked) {
-      contactListChecked.classList.remove("edit-contactlist-selected");
     }
   }
 
@@ -314,25 +289,43 @@ function showEditUsersEmblem(task) {
     usersEmblem.innerHTML += renderGreyEmblem(extraCount);
   }
 }
+
 /**
- * Updates the state of user checkboxes based on the rendered emblems.
- * @return {void} This function does not return a value.
+ * Speichert die geänderte Auswahl von Benutzern in einer Aufgabe.
+ * Wird aufgerufen, wenn eine Checkbox im Edit-Fenster geändert wird.
+ * Aktualisiert die checked-Status der Benutzer in der Aufgabe und
+ * aktualisiert die Anzeige der Benutzerembleme.
  */
-function checkUserCheckboxesBasedOnEmblems() {
-  let renderedEmblems = document.querySelectorAll(
-    "#editUsersEmblem .edit-emblem"
-  );
-  console.log("renderedEmblems:", renderedEmblems);
-  let renderedUserIds = new Set();
-  for (let emblem of renderedEmblems) {
-    renderedUserIds.add(emblem.id);
-    console.log(emblem.id);
+async function saveCheckedUsers() {
+  const taskId = boardEdit[0]?.cardId;
+  const task = tasks.find((t) => t.cardId == taskId);
+
+  if (!task || !task.task_contacts) return;
+
+  for (let i = 0; i < contacts.length; i++) {
+    const checkbox = document.getElementById(`editCheckbox${i}`);
+    const contactListItem = document.getElementById(`edit-contactlist${i}`);
+    const contact = contacts[i];
+
+    if (checkbox) {
+      const contactInTask = task.task_contacts.find(
+        (tc) => tc.contact.id === contact.id
+      );
+
+      if (contactInTask) {
+        contactInTask.checked = checkbox.checked;
+
+        if (checkbox.checked) {
+          contactListItem.classList.add("edit-contactlist-selected");
+        } else {
+          contactListItem.classList.remove("edit-contactlist-selected");
+        }
+      }
+    }
   }
-  let userCheckboxes = document.querySelectorAll(".edit-user-checkbox");
-  for (let checkbox of userCheckboxes) {
-    let cardId = checkbox.dataset.userid;
-    checkbox.checked = renderedUserIds.has(cardId) || hiddenUserIds.has(cardId);
-  }
+
+  updateCheckedUsersInEdit();
+  await updateEditBoard(task.cardId, task);
 }
 
 /**
@@ -372,12 +365,9 @@ async function editTask(cardId, event) {
  */
 async function updateEditBoard(cardId, updatedTask) {
   try {
-    // Debugging: Überprüfen der Daten
     console.log("Updating task with ID:", cardId);
     console.log("Updated task data:", updatedTask);
-
-    // PUT-Anfrage an das Backend senden
-    const response = await putData(`tasks/${cardId}`, updatedTask);
+    await putData(`tasks/${cardId}`, updatedTask);
   } catch (error) {
     console.error("Error updating task:", error);
   }
@@ -405,7 +395,13 @@ function getEditSelectedContactIds() {
   let selectedContactIds = [];
   for (let checkbox of checkboxes) {
     let contactId = checkbox.getAttribute("data-userid");
-    selectedContactIds.push(contactId);
+    let contact = contacts.find((c) => c.id == contactId);
+    if (contact) {
+      selectedContactIds.push({
+        contact: contact,
+        checked: checkbox.checked
+      });
+    }
   }
   return selectedContactIds;
 }

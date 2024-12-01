@@ -266,3 +266,10 @@
     padding: 30px 24px 30px 20px;
   }
 }
+
+@media (max-width: 480px) {
+  .small-useremblem {
+    width: 30px;
+    height: 28px;
+  }
+}

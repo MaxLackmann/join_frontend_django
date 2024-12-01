@@ -201,7 +201,7 @@ function renderGreyEmblem(remainingCount) {
  */
 function renderEmblemUsers(contact) {
   return /*html*/ `
-      <div class="emblem" style="background-color: ${contact.color}" id="${contact.userId}">
+      <div class="emblem" style="background-color: ${contact.color}" id="${contact.id}">
       ${contact.emblem}
     </div>  `;
 }
